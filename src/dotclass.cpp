@@ -14,7 +14,7 @@ typedef struct classfile{
     u2 super_class;
     
     u2 interfaces_count;
-    u2* interfaces;
+    interface_info* interfaces;
 
     u2 fields_count;
     field_info* fields;
