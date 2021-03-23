@@ -1,5 +1,5 @@
-#include <types.h>
-#include <utils.h>
+#include "types.h"
+#include "utils.h"
 
 typedef struct classfile{
     u4 magic;
@@ -24,4 +24,4 @@ typedef struct classfile{
 
     u2 attributes_count;
     attribute_info* attributes;
-};
+}classfile;
