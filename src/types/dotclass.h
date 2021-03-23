@@ -1,6 +1,15 @@
-#include "types.h"
-#include "utils.h"
+#include "constant_info.h"
+#include "field_info.h"
+#include "method_info.h"
 
+typedef CONSTANT_Class_info interface_info;
+
+
+/**
+ * @brief Represents the Classfile format.
+ *
+ * Structure that stores the classfile
+ */
 typedef struct classfile{
     u4 magic;
     u2 minor_version;
