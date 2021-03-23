@@ -15,23 +15,3 @@
 #define ACC_SYNTHETIC  0x1000
 #define ACC_ANNOTATION 0x2000
 #define ACC_ENUM       0x4000
-
-enum class AccessFlag {
-    PUBLIC,
-    PRIVATE,
-    PROTECTED,
-    STATIC,
-    FINAL,
-    SUPER,
-    VOLATILE, //field
-    BRIDGE, //method
-    TRANSIENT, //field
-    VARARGS, //method
-    NATIVE,
-    INTERFACE,
-    ABSTRACT,
-    STRICT,
-    SYNTHETIC,
-    ANNOTATION,
-    ENUM
-};

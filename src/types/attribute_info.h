@@ -1,4 +1,7 @@
-#include "utils.h"
+#pragma once
+#include "../utils.h"
+
+struct attribute_info;
 
 /**
 * @brief Constant value attribute.
@@ -139,4 +142,4 @@ typedef struct attribute_info
         InnerClasses_attribute innerclasses;
         StackMapTable_attribute stackmaptable;
     } info;
-};
+}attribute_info;

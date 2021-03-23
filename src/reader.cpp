@@ -1,7 +1,7 @@
-#include "constant_info.h"
+#include "reader.h"
 
-void read_cp_info(cp_info cp[], int size, FILE *fp) {
-    for (int i=1; i < size; i++) {
+void read_cp_info(cp_info cp[], int cp_count, FILE *fp) {
+    for (int i=1; i < cp_count; i++) {
         cp_info *ptr = &cp[i];
         ptr->tag = read_u1(fp);
 
