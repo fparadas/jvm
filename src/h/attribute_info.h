@@ -20,6 +20,15 @@ typedef struct
 *
 * Contains the JVM instructions and auxiliary information for a method.
 */
+
+typedef struct 
+{
+    u2 start_pc;
+    u2 end_pc;
+    u2 handler_pc;
+    u2 catch_type;
+} ExcTable;
+
 typedef struct
 {
     u2 max_stack;
@@ -28,13 +37,7 @@ typedef struct
     u1 *code; /* n=code_length */
     u2 exception_table_length;
 
-    struct ExcTable
-    {
-        u2 start_pc;
-        u2 end_pc;
-        u2 handler_pc;
-        u2 catch_type;
-    } * exception_table; /* n=exception_table_length */
+    ExcTable* exception_table; /* n=exception_table_length */
 
     u2 attributes_count;
     attribute_info *attributes; /* n=attributes_count */
@@ -56,14 +59,16 @@ typedef struct
 *
 * Determines which line part of the code corresponds to a given line number.
 */
+typedef struct 
+{
+    u2 start_pc;
+    u2 line_number;
+} LineNTable; 
+
 typedef struct
 {
     u2 line_number_table_length;
-    struct LineNTable
-    {
-        u2 start_pc;
-        u2 line_number;
-    } * line_number_table;
+    LineNTable *line_number_table;
 } LineNumberTable_attribute;
 
 /**
@@ -98,14 +103,16 @@ typedef struct
 */
 typedef struct
 {
+    u2 inner_class_info_index;
+    u2 outer_class_info_index;
+    u2 inner_name_index;
+    u2 inner_class_access_flags;
+} ClassesIn; /* n=number_of_classes */
+
+typedef struct
+{
     u2 number_of_classes;
-    struct
-    {
-        u2 inner_class_info_index;
-        u2 outer_class_info_index;
-        u2 inner_name_index;
-        u2 inner_class_access_flags;
-    } *classes; /* n=number_of_classes */
+    ClassesIn* classes;
 } InnerClasses_attribute;
 
 

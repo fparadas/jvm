@@ -242,7 +242,7 @@ void read_code_attribute(Code_attribute* code_ptr, FILE* fp, cp_info* cp){
     }
 
     code_ptr->exception_table_length = read_u2(fp);
-    code_ptr->exception_table = calloc(4*sizeof(u2), code_ptr->exception_table_length);
+    code_ptr->exception_table = (ExcTable*) calloc(4*sizeof(u2), code_ptr->exception_table_length);
     for(i = 0; i < code_ptr->exception_table_length; i++) {
         code_ptr->exception_table[i].start_pc = read_u2(fp);
         code_ptr->exception_table[i].end_pc = read_u2(fp);
@@ -285,7 +285,7 @@ void read_linenumbertable_attribute(LineNumberTable_attribute *lineNum_ptr, FILE
     assert(fp);
 
     lineNum_ptr->line_number_table_length = read_u2(fp);
-    lineNum_ptr->line_number_table = calloc(2*sizeof(u2), lineNum_ptr->line_number_table_length);
+    lineNum_ptr->line_number_table = (LineNTable*) calloc(2*sizeof(u2), lineNum_ptr->line_number_table_length);
 
     int i;
     for (i = 0; i < lineNum_ptr->line_number_table_length; i++) {
@@ -310,7 +310,7 @@ void read_innerclasses_attribute(InnerClasses_attribute *innerClass_ptr, FILE *f
     assert(fp);
 
     innerClass_ptr->number_of_classes = read_u2(fp);
-    innerClass_ptr->classes = calloc(4*sizeof(u2), innerClass_ptr->number_of_classes);
+    innerClass_ptr->classes = (ClassesIn*) calloc(4*sizeof(u2), innerClass_ptr->number_of_classes);
 
     int i;
     for (i = 0; i < innerClass_ptr->number_of_classes; i++) {
