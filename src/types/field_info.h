@@ -12,4 +12,4 @@ typedef struct field_info
     u2 description_index;
     u2 attribute_count;
     attribute_info *attributes;
-};
+}field_info;
