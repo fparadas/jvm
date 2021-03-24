@@ -8,6 +8,7 @@ std::vector<u4> acc_flags;
 std::string get_flags(std::string access_map, u4 code) {
     std::string res = "";
     u4 temp = code;
+
     if (temp % 16 != 0) {
         if(access_map == "fields") {
             res = res + ACC_FLAGS_FIELD[temp % 16] + ";";

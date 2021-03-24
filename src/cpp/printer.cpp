@@ -66,24 +66,29 @@ void print_all(classfile *cf) {
 
 void print_cp_info(classfile *cf) {
     for (int i = 1; i < cf->cp_count; i++) {
+        std::cout << "\t[" << i <<"]:";
         print_cp_element(cf->cp, i);
+        std::cout <<std::endl;
+        if (cf->cp[i].tag == CONSTANT_Double || cf->cp[i].tag == CONSTANT_Long ){
+            i++;
+        }
     }
 }
 
 void print_cp_element(cp_info *cp, u2 i) {
     double d;
     u2 name_index, string_index, class_index, name_and_type_index, descriptor_index;
-    u4 high, low;
-    uint64_t lg;
+    u4 high;
+    uint64_t low, lg, conc;
     switch(cp[i].tag) {
         case CONSTANT_Utf8:
-            std::cout << "Utf8:\t" << get_cp_string(cp, i) << "\n";
+            std::cout << "Utf8:\t" << get_cp_string(cp, i);
             break;
         case CONSTANT_Integer:
-            std::cout << "Integer:\t" << static_cast<int>(cp[i].info.integer_info.bytes) << "\n";
+            std::cout << "Integer:\t" << std::dec <<static_cast<int>(cp[i].info.integer_info.bytes);
             break;
         case CONSTANT_Float:
-            std::cout << "Float:\t" << static_cast<float>(cp[i].info.integer_info.bytes) << "\n";
+            std::cout << "Float:\t" << static_cast<float>(cp[i].info.integer_info.bytes);
             //#TODO testar se funciona
             break;
         case CONSTANT_Long:
@@ -92,31 +97,31 @@ void print_cp_element(cp_info *cp, u2 i) {
             low = cp[i].info.long_info.low_bytes;
 
             lg = ((uint64_t) high << 32) | ((uint64_t) low);
-            printf("%ld\n", lg);
+            printf("%ld", lg);
             break;
         case CONSTANT_Double:
             printf("Double:\t");
             high = cp[i].info.long_info.high_bytes;
             low = cp[i].info.long_info.low_bytes;
 
-            lg = ((uint64_t) high << 32) | ((uint64_t) low);
-            d = (double) lg;
-            printf("%lf\n", d);
+            conc = ((uint64_t) high << 32) + ((uint64_t) low);
+            d = *((double *) (&conc));
+            printf("%lf", d);
             break;
         case CONSTANT_Class:
             name_index = cp[i].info.class_info.name_index;
-            std::cout << "Class:\t" <<  get_cp_string(cp, name_index) << "(" << name_index << ")\n";
+            std::cout << "Class:\t" <<  get_cp_string(cp, name_index) << "(" << name_index << ")";
             break;
         case CONSTANT_String:
             printf("String:\t");
             string_index = cp[i].info.string_info.string_index;
-            std::cout << "String:\t" <<  get_cp_string(cp, string_index) << "(" << string_index << ")\n";
+            std::cout << "String:\t" <<  get_cp_string(cp, string_index) << "(" << string_index << ")";
             break;
         case CONSTANT_Fieldref:
             printf("Fieldref:\t");
             class_index = cp[i].info.fieldref_info.class_index;
             name_and_type_index = cp[i].info.fieldref_info.name_and_type_index;
-            printf("%s.%s:%s (#%d.#%d)\n", get_class_name_string(cp, class_index),
+            printf("%s.%s:%s (#%d.#%d)", get_class_name_string(cp, class_index),
                 get_name_and_type_string(cp, name_and_type_index, 1),
                 get_name_and_type_string(cp, name_and_type_index, 0),
                 class_index, name_and_type_index);
@@ -125,7 +130,7 @@ void print_cp_element(cp_info *cp, u2 i) {
             printf("Methodref:\t");
             class_index = cp[i].info.methodref_info.class_index;
             name_and_type_index = cp[i].info.methodref_info.name_and_type_index;
-            printf("%s.%s:%s (#%d.#%d)\n", get_class_name_string(cp, class_index),
+            printf("%s.%s:%s (#%d.#%d)", get_class_name_string(cp, class_index),
                 get_name_and_type_string(cp, name_and_type_index, 1),
                 get_name_and_type_string(cp, name_and_type_index, 0), 
                 class_index, name_and_type_index);
@@ -134,7 +139,7 @@ void print_cp_element(cp_info *cp, u2 i) {
             printf("InterfaceMethodref\t");
             class_index = cp[i].info.methodref_info.class_index;
             name_and_type_index = cp[i].info.methodref_info.name_and_type_index;
-            printf("%s.%s:%s (#%d.#%d)\n", get_class_name_string(cp, class_index),
+            printf("%s.%s:%s (#%d.#%d)", get_class_name_string(cp, class_index),
                 get_name_and_type_string(cp, name_and_type_index, 1),
                 get_name_and_type_string(cp, name_and_type_index, 0), 
                 class_index, name_and_type_index);
@@ -143,7 +148,7 @@ void print_cp_element(cp_info *cp, u2 i) {
             printf("NameAndType:\t");
             name_index = cp[i].info.nameandtype_info.name_index;
             descriptor_index = cp[i].info.nameandtype_info.descriptor_index;
-            printf("%s:%s (#%d:#%d)\n", get_cp_string(cp, name_index),
+            printf("%s:%s (#%d:#%d)", get_cp_string(cp, name_index),
                 get_cp_string(cp, descriptor_index),
                 name_index, descriptor_index);
             break;
@@ -218,7 +223,7 @@ void print_methods_info(classfile *cf) {
 }
 
 void print_attributes(attribute_info attr[], u2 attr_count, cp_info *cp) {
-    for (int i = 0; i < attr_count; i++) {
+    for (u2 i = 0; i < attr_count; i++) {
         print_attribute_info(&attr[i], cp);
     }
 }
@@ -315,87 +320,87 @@ void print_code_attribute(Code_attribute *ptr, cp_info *cp) {
       f = i;
       std::cout << "\t\t " << i << "\t" << strings_opcodes[ptr->code[i]];
       switch (opargs[ptr->code[i]]){
-	case 1:
-	  if ((ptr->code[i] >= OP_iload && ptr->code[i] >= OP_aload) || ptr->code[i] == OP_ret)
-	    printf (" %d", ptr->code[++i]);
-	  else if (ptr->code[i] == OP_ldc){
-	    printf (" #%u ", ptr->code[++i]);
-	    print_cp_element (cp, ptr->code[i]);
-	  }
-	  else
-	    printf (" %d", ptr->code[++i]);
-	  break;
-	case 2:
-	  param1 = ptr->code[++i];
-	  param2 = ptr->code[++i];
-	  if ((ptr->code[f] >= OP_ifeq && ptr->code[f] <= OP_jsr) ||
-	    ptr->code[f] == OP_ifnull || ptr->code[f] == OP_ifnonnull ||
-	    ptr->code[f] == OP_sipush) {
+        case 1:
+        if ((ptr->code[i] >= OP_iload && ptr->code[i] >= OP_aload) || ptr->code[i] == OP_ret)
+            printf (" %d", ptr->code[++i]);
+        else if (ptr->code[i] == OP_ldc){
+            printf (" #%u ", ptr->code[++i]);
+            print_cp_element (cp, ptr->code[i]);
+        }
+        else
+            printf (" %d", ptr->code[++i]);
+        break;
+        case 2:
+        param1 = ptr->code[++i];
+        param2 = ptr->code[++i];
+        if ((ptr->code[f] >= OP_ifeq && ptr->code[f] <= OP_jsr) ||
+            ptr->code[f] == OP_ifnull || ptr->code[f] == OP_ifnonnull ||
+            ptr->code[f] == OP_sipush) {
 
-	    result = (param1 << 8) + param2;
-	    printf (" %d", (int16_t) result);
-	  }
-	  else if (ptr->code[f] == OP_iinc){
-	    printf (" %u by %d", param1, (int8_t) param2);
-	  }
-	  else if (ptr->code[f] == OP_ldc_w || ptr->code[f] == OP_ldc2_w ||
-	    (ptr->code[f] >= OP_getstatic && ptr->code[f] <= OP_invokestatic) ||
-	    ptr->code[f] == OP_new || ptr->code[f] == OP_anewarray ||
-	    ptr->code[f] == OP_checkcast || ptr->code[f] == OP_instanceof) {
+            result = (param1 << 8) + param2;
+            printf (" %d", (int16_t) result);
+        }
+        else if (ptr->code[f] == OP_iinc){
+            printf (" %u by %d", param1, (int8_t) param2);
+        }
+        else if (ptr->code[f] == OP_ldc_w || ptr->code[f] == OP_ldc2_w ||
+            (ptr->code[f] >= OP_getstatic && ptr->code[f] <= OP_invokestatic) ||
+            ptr->code[f] == OP_new || ptr->code[f] == OP_anewarray ||
+            ptr->code[f] == OP_checkcast || ptr->code[f] == OP_instanceof) {
 
-	    result = (param1 << 8) + param2;
-	    printf (" #%u ", result);
-	    print_cp_element (cp, (u2) result);
-	  }
-	  else {
-	    printf (" %d", param1);
-	    printf (" %d", param2);
-	  }
-	  break;
-	case 3:
-	  param1 = ptr->code[++i];
-	  param2 = ptr->code[++i];
-	  param3 = ptr->code[++i];
-	  if (ptr->code[f] == OP_multianewarray) {
-	    result = (param1 << 8) + param2;
-	    printf (" #%u", result);
-	    print_cp_element (cp, (u2) result);
-	    printf (" Dimensão: %u", param3);
-	  }
-	  else {
-	    printf (" %d", param1);
-	    printf (" %d", param2);
-	    printf (" %d", param3);
-	  }
-	  break;
-	case 4:
-	  param1 = ptr->code[++i];
-	  param2 = ptr->code[++i];
-	  param3 = ptr->code[++i];
-	  param4 = ptr->code[++i];
-	  if (ptr->code[f] == OP_goto_w || ptr->code[f] == OP_jsr_w) {
-	    result = (param1 << 24) + (param2 << 16) + (param3 << 8) + param4;
-	    printf (" %d", (int32_t) result);
-	  }
-	  else if (ptr->code[f] == OP_invokedynamic || ptr->code[f] == OP_invokeinterface){
-	    result = (param1 << 8) + param2;
-	    printf (" #%u", result);
-	    print_cp_element (cp, (u2) result);
-	    printf (" %d", param3);
-	    printf (" %d", param4);
-	  }
-	  else {
-	    printf (" %d", param1);
-	    printf (" %d", param2);
-	    printf (" %d", param3);
-	    printf (" %d", param4);
-	  }
-	  break;
-	case 0:
-	  break;
-	default:
-	  break;
-      }
+            result = (param1 << 8) + param2;
+            printf (" #%u ", result);
+            print_cp_element (cp, (u2) result);
+        }
+        else {
+            printf (" %d", param1);
+            printf (" %d", param2);
+        }
+        break;
+        case 3:
+        param1 = ptr->code[++i];
+        param2 = ptr->code[++i];
+        param3 = ptr->code[++i];
+        if (ptr->code[f] == OP_multianewarray) {
+            result = (param1 << 8) + param2;
+            printf (" #%u", result);
+            print_cp_element (cp, (u2) result);
+            printf (" Dimensão: %u", param3);
+        }
+        else {
+            printf (" %d", param1);
+            printf (" %d", param2);
+            printf (" %d", param3);
+        }
+        break;
+        case 4:
+        param1 = ptr->code[++i];
+        param2 = ptr->code[++i];
+        param3 = ptr->code[++i];
+        param4 = ptr->code[++i];
+        if (ptr->code[f] == OP_goto_w || ptr->code[f] == OP_jsr_w) {
+            result = (param1 << 24) + (param2 << 16) + (param3 << 8) + param4;
+            printf (" %d", (int32_t) result);
+        }
+        else if (ptr->code[f] == OP_invokedynamic || ptr->code[f] == OP_invokeinterface){
+            result = (param1 << 8) + param2;
+            printf (" #%u", result);
+            print_cp_element (cp, (u2) result);
+            printf (" %d", param3);
+            printf (" %d", param4);
+        }
+        else {
+            printf (" %d", param1);
+            printf (" %d", param2);
+            printf (" %d", param3);
+            printf (" %d", param4);
+        }
+        break;
+        case 0:
+        break;
+        default:
+        break;
+        }
 
       printf("\t(0x%x)\n", ptr->code[f]);
     }
