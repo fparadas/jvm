@@ -23,7 +23,7 @@
 #define ACC_ENUM              0x4000
 
 /**
- * @brief Populates access flags map
+ * @brief Prints access flags as strings
  * @param access_map wich of the 3 maps are we printing
  * @param code access code to print
  */
