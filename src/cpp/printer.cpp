@@ -165,7 +165,7 @@ void print_methods_info(classfile *cf) {
         method_info *method = &cf->methods[i];
 
         std::cout << "\tName:\t" << get_cp_string(cf->cp, method->name_index) << "\n";
-        std::cout << "\tDescriptor:\t" << get_cp_string(cf->cp, method->descriptor_index) << "\n";
+        std::cout << "\tDescriptor:\t" << get_cp_string(cf->cp, method->description_index) << "\n";
 
         std::cout << "\tFlags:\t" << get_flags("methods", method->access_flags) << "\n";
 
