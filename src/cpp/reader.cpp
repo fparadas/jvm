@@ -337,3 +337,25 @@ void read_stackmaptable_attribute(StackMapTable_attribute *smt_ptr, FILE *fp) {
     smt_ptr->length = read_u4(fp);
     smt_ptr->n_entries = read_u2(fp);
 }
+
+void read_interfaces(FILE *fp, CONSTANT_Class_info interfaces[], uint16_t interfaces_count) {
+  int i;
+  for (i = 0; i < interfaces_count; i++) {
+    CONSTANT_Class_info *ptr = &interfaces[i];
+    ptr->name_index = read_u2(fp);
+  }
+}
+
+void read_methods(FILE *fp, method_info methods[], uint16_t methods_count, cp_info *cp) {
+  int i;
+  for (i = 0; i < methods_count; i++) {
+    method_info *ptr = &methods[i];
+    read_method_entry(fp, ptr, cp);
+  }
+}
+
+void read_method_entry(FILE *fp, method_info *method, cp_info *cp) {
+  read_single_field(fp, (field_info *) method, cp);
+}
+
+

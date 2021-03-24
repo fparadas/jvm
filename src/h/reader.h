@@ -202,6 +202,36 @@ void read_synthetic_attribute(attribute_info *synthetic_ptr, FILE *fp);
 */
 void read_stackmaptable_attribute(StackMapTable_attribute *smt_ptr, FILE *fp);
 
+/**
+* Reads interfaces
+*
+* @param fp pointer the to .class file
+* @param interfaces array of interfaces
+* @param interfaces_count number of interfaces
+*/
+void read_interfaces(FILE *fp, CONSTANT_Class_info interfaces[], u2 interfaces_count);
+
+/**
+* Reads interfaces
+*
+* @param fp pointer the to .class file
+* @param methods array of methods
+* @param methods_count number of methods
+* @param cp pointer to the constant info structure
+*/
+void read_methods(FILE *fp, method_info methods[], u2 methods_count, cp_info *cp);
+
+/**
+* Reads interfaces
+*
+* @param fp pointer the to .class file
+* @param method pointer to a method_info structure
+* @param cp pointer to the constant info structure
+*/
+void read_method_entry(FILE *fp, method_info *method, cp_info *cp);
+
+
+
 
 
 
