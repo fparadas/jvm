@@ -31,6 +31,11 @@ void print_all(classfile *cf);
 void print_cp_info(classfile *cf);
 
 /**
+ * @brief Prints a constant pool element tag detail.
+ * @param tag elemet tag
+ */
+void print_cp_tag(u1 tag);
+/**
  * @brief Prints a constant pool element detail.
  * @param cp cp_info array
  * @param index index on cp_info array
@@ -77,4 +82,12 @@ void print_sourcefile_attribute(SourceFile_attribute *attr);
 
 void print_innerclasses_attribute(InnerClasses_attribute *ptr,cp_info *cp);
 
-void print_stackmaptable_attribute(StackMapTable_attribute *attr);
+void print_stackmaptable_attribute(StackMapTable_attribute *attr, cp_info *cp);
+
+void print_sourcefile_attribute(SourceFile_attribute *attr, cp_info *cp);
+
+void print_java_version (u2 major,  u2 minor);
+
+void print_stack_map_frame(StackMapFrame *frame, cp_info *cp);
+
+void print_verification_type_info(VerificationTypeInfo *info, cp_info *cp);

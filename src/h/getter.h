@@ -1,7 +1,10 @@
 #pragma once
 #include "utils.h"
 #include "dotclass.h"
-
+#include <cstdio>
+#include <typeinfo>
+#include <string.h>
+#include <string>
 
 /**
  * @brief Return pointer to string in constant pool table.
@@ -42,3 +45,9 @@ char *get_class_name_string(cp_info *cp, u2 class_index);
  * @param flag choses between descriptor or name if (flag) name else descriptor
  */
 char *get_name_and_type_string(cp_info *cp, u2 index, u1 flag);
+
+/**
+ * @brief Return string containing source file name
+ * @param cf classfile
+ */
+char *get_source_file(classfile *cf);

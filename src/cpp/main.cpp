@@ -29,19 +29,16 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    std::cout << "=============reading file=============" << std::endl;
     if(read_class_file(&cf, fp)) {
-        std::cout << "=============file read=============" << std::endl;
-        std::cout << "=============populating acc maps=============" << std::endl;
         populate_acc_maps();
-        std::cout << "=============acc maps populated=============" << std::endl;
 
-        std::cout << "=============populating opargs=============" << std::endl;
         init_opargs();
-        std::cout << "=============opargs populated=============" << std::endl;
-
-
-
+        char *src_file = strtok(get_source_file(&cf), ".");
+        char *this_file = strtok(filename, ".");
+        if(strcmp(src_file, this_file)) {
+            std::cout << "File name differs of source file name, aborting " << src_file << std::endl;
+            return 1;
+        }
         if(!strcmp(option, "default") || !strcmp(option, "--summary")) {
             print_summary(&cf);
         } else if (!strcmp(option, "--show-all")) {

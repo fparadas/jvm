@@ -1,5 +1,4 @@
 #include "../h/getter.h"
-#include <typeinfo>
 
 char *get_cp_string(cp_info *cp, u2 index) {
     assert(cp);
@@ -40,4 +39,16 @@ char *get_name_and_type_string(cp_info *cp, u2 index, u1 flag) {
         return get_cp_string(cp, entry->info.nameandtype_info.name_index);
     else
         return get_cp_string(cp, entry->info.nameandtype_info.descriptor_index);
+}
+
+char *get_source_file(classfile *cf) {
+    char str[200];
+    u2 attr_count = cf->attributes_count;
+
+    for (u2 i = 0; i < attr_count; i++) {
+        if(!strcmp(get_cp_string(cf->cp, cf->attributes[i].attribute_name_index), "SourceFile")) {
+            return get_cp_string(cf->cp, cf->attributes[i].info.sourcefile.sourcefile_index);
+        }
+    }
+    return (char *) "ERROR no SourceFile_Attribute";
 }

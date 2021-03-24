@@ -49,3 +49,7 @@ void populate_acc_fields_map();
  * @brief Populates access flags map
  */
 void populate_acc_methods_map();
+
+std::string get_fields_flags(u4 code);
+std::string get_methods_flags(u4 code);
+std::string get_class_flags(u4 code);

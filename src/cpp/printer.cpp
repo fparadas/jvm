@@ -1,4 +1,6 @@
 #include "../h/printer.h"
+#include <iterator>
+#include <ostream>
 
 void print_summary(classfile *cf) {
     if (!cf) return;
@@ -36,7 +38,7 @@ void print_all(classfile *cf) {
 
     std::cout << "major: " << std::dec<<static_cast<int>(cf->major_version) << "\n"; 
     std::cout << "minor: " << std::dec<<static_cast<int>(cf->minor_version) << "\n"; 
-
+    print_java_version(cf->major_version, cf->minor_version);
     std::cout << "cp_count: " << static_cast<int>(cf->cp_count) << "\n";
     print_cp_info(cf);
 
@@ -67,6 +69,7 @@ void print_all(classfile *cf) {
 void print_cp_info(classfile *cf) {
     for (int i = 1; i < cf->cp_count; i++) {
         std::cout << "\t[" << i <<"]:";
+        print_cp_tag(cf->cp[i].tag);
         print_cp_element(cf->cp, i);
         std::cout <<std::endl;
         if (cf->cp[i].tag == CONSTANT_Double || cf->cp[i].tag == CONSTANT_Long ){
@@ -75,24 +78,62 @@ void print_cp_info(classfile *cf) {
     }
 }
 
+void print_cp_tag(u1 tag) {
+    switch(tag) {
+        case CONSTANT_Utf8:
+            std::cout << "Utf8:\t";
+            break;
+        case CONSTANT_Integer:
+            std::cout << "Integer:\t" ;
+            break;
+        case CONSTANT_Float:
+            std::cout << "Float:\t";
+            break;
+        case CONSTANT_Long:
+            std::cout <<  "Long:\t";
+            break;
+        case CONSTANT_Double:
+            std::cout <<  "Double:\t";
+            break;
+        case CONSTANT_Class:
+            std::cout <<  "Class:\t";
+            break;
+        case CONSTANT_String:
+            std::cout <<  "String:\t";
+            break;
+        case CONSTANT_Fieldref:
+            std::cout <<  "Fieldref:\t";
+            break;
+        case CONSTANT_Methodref:
+            std::cout <<  "Methodref:\t";
+            break;
+        case CONSTANT_InterfaceMethodref:
+            std::cout <<  "InterfaceMethodref:\t";
+            break;
+        case CONSTANT_NameAndType:
+            std::cout <<  "NameAndType:\t";
+            break;
+    }
+}
+
 void print_cp_element(cp_info *cp, u2 i) {
     double d;
+    float f;
     u2 name_index, string_index, class_index, name_and_type_index, descriptor_index;
     u4 high;
     uint64_t low, lg, conc;
     switch(cp[i].tag) {
         case CONSTANT_Utf8:
-            std::cout << "Utf8:\t" << get_cp_string(cp, i);
+            std::cout << get_cp_string(cp, i);
             break;
         case CONSTANT_Integer:
-            std::cout << "Integer:\t" << std::dec <<static_cast<int>(cp[i].info.integer_info.bytes);
+            std::cout << std::dec <<static_cast<int>(cp[i].info.integer_info.bytes);
             break;
         case CONSTANT_Float:
-            std::cout << "Float:\t" << static_cast<float>(cp[i].info.integer_info.bytes);
-            //#TODO testar se funciona
+            memcpy(&f, &cp[i].info.integer_info.bytes, sizeof(float));
+            std::cout << f;
             break;
         case CONSTANT_Long:
-            printf("Long:\t");
             high = cp[i].info.long_info.high_bytes;
             low = cp[i].info.long_info.low_bytes;
 
@@ -100,7 +141,6 @@ void print_cp_element(cp_info *cp, u2 i) {
             printf("%ld", lg);
             break;
         case CONSTANT_Double:
-            printf("Double:\t");
             high = cp[i].info.long_info.high_bytes;
             low = cp[i].info.long_info.low_bytes;
 
@@ -110,15 +150,13 @@ void print_cp_element(cp_info *cp, u2 i) {
             break;
         case CONSTANT_Class:
             name_index = cp[i].info.class_info.name_index;
-            std::cout << "Class:\t" <<  get_cp_string(cp, name_index) << "(" << name_index << ")";
+            std::cout << get_cp_string(cp, name_index) << "(" << name_index << ")";
             break;
         case CONSTANT_String:
-            printf("String:\t");
             string_index = cp[i].info.string_info.string_index;
             std::cout << "String:\t" <<  get_cp_string(cp, string_index) << "(" << string_index << ")";
             break;
         case CONSTANT_Fieldref:
-            printf("Fieldref:\t");
             class_index = cp[i].info.fieldref_info.class_index;
             name_and_type_index = cp[i].info.fieldref_info.name_and_type_index;
             printf("%s.%s:%s (#%d.#%d)", get_class_name_string(cp, class_index),
@@ -127,7 +165,6 @@ void print_cp_element(cp_info *cp, u2 i) {
                 class_index, name_and_type_index);
             break;
         case CONSTANT_Methodref:
-            printf("Methodref:\t");
             class_index = cp[i].info.methodref_info.class_index;
             name_and_type_index = cp[i].info.methodref_info.name_and_type_index;
             printf("%s.%s:%s (#%d.#%d)", get_class_name_string(cp, class_index),
@@ -136,7 +173,6 @@ void print_cp_element(cp_info *cp, u2 i) {
                 class_index, name_and_type_index);
             break;
         case CONSTANT_InterfaceMethodref:
-            printf("InterfaceMethodref\t");
             class_index = cp[i].info.methodref_info.class_index;
             name_and_type_index = cp[i].info.methodref_info.name_and_type_index;
             printf("%s.%s:%s (#%d.#%d)", get_class_name_string(cp, class_index),
@@ -145,7 +181,6 @@ void print_cp_element(cp_info *cp, u2 i) {
                 class_index, name_and_type_index);
             break;
         case CONSTANT_NameAndType:
-            printf("NameAndType:\t");
             name_index = cp[i].info.nameandtype_info.name_index;
             descriptor_index = cp[i].info.nameandtype_info.descriptor_index;
             printf("%s:%s (#%d:#%d)", get_cp_string(cp, name_index),
@@ -223,6 +258,7 @@ void print_methods_info(classfile *cf) {
 }
 
 void print_attributes(attribute_info attr[], u2 attr_count, cp_info *cp) {
+    assert(attr);
     for (u2 i = 0; i < attr_count; i++) {
         print_attribute_info(&attr[i], cp);
     }
@@ -230,8 +266,8 @@ void print_attributes(attribute_info attr[], u2 attr_count, cp_info *cp) {
 
 void print_attribute_info(attribute_info *att_ptr, cp_info *cp)
 {
+    
     char *str = get_cp_string(cp, att_ptr->attribute_name_index);
-
     if (strcmp("Code", str) == 0)
     {
        print_code_attribute(&att_ptr->info.code, cp);
@@ -250,7 +286,7 @@ void print_attribute_info(attribute_info *att_ptr, cp_info *cp)
     }
     else if (strcmp("SourceFile", str) == 0)
     {
-    //    print_sourcefile_attribute(&att_ptr->info.sourcefile);
+        print_sourcefile_attribute(&att_ptr->info.sourcefile, cp);
     }
     else if (strcmp("InnerClasses", str) == 0)
     {
@@ -262,7 +298,7 @@ void print_attribute_info(attribute_info *att_ptr, cp_info *cp)
     }
     else if (strcmp("StackMapTable", str) == 0)
     {
-       print_stackmaptable_attribute(&att_ptr->info.stackmaptable);
+       print_stackmaptable_attribute(&att_ptr->info.stackmaptable, cp);
     }
     else
     {
@@ -270,14 +306,97 @@ void print_attribute_info(attribute_info *att_ptr, cp_info *cp)
     }
 }
 
-void print_stackmaptable_attribute(StackMapTable_attribute *attr) {
-    std::cout << "StackMapTable: { ";
-
-    std::cout << "Index: " << static_cast<int>(attr->index) << ", ";
-    std::cout << "Length: " << static_cast<int>(attr->length) << ", ";
-    std::cout << "N Entries: " << static_cast<int>(attr->n_entries) << "}\n";
+void print_sourcefile_attribute(SourceFile_attribute *attr, cp_info *cp) {
+    std::cout << "SouceFile: " << get_cp_string(cp, attr->sourcefile_index) << std::endl;
 }
 
+void print_stackmaptable_attribute(StackMapTable_attribute *attr, cp_info *cp) {
+    std::cout << "\t\t StackMapTable: { " << std::endl;
+    int n_entries = static_cast<int>(attr->n_entries);
+    std::cout << "\t\t\tN Entries: " << n_entries << std::endl;
+
+    for (int i=0; i < n_entries; i++) {
+        std::cout << "\t\t\t" << i <<": ";
+        print_stack_map_frame(&attr->stack[i], cp);
+    }
+    std::cout << "\t\t }" << std::endl;
+
+}
+
+void print_stack_map_frame(StackMapFrame *frame, cp_info *cp) {
+    int type = static_cast<int>(frame->frame_type);
+    if (type <= 67) {
+        std::cout << "SAME" <<std::endl;
+    } else if (type >=64 && type <= 127) {
+        std::cout << "SAME_LOCALS_1_STACK_ITEM" <<std::endl;
+        std::cout << "Local verifications: " <<std::endl;
+        print_verification_type_info(frame->map_frame_type.same_locals_1_stack_item_frame.stack, cp);
+
+    } else if (type == 247) {
+        std::cout << "SAME_LOCALS_1_STACK_ITEM_EXTENDED, Offset: " << std::dec << frame->map_frame_type.same_locals_1_stack_item_frame_extended.offset_delta <<std::endl;
+        std::cout << "\t\t\t" << "Local verifications: " <<std::endl;
+        print_verification_type_info(frame->map_frame_type.same_locals_1_stack_item_frame_extended.stack, cp);
+    } else if (type >= 248 && type <= 250) {
+        std::cout << "CHOP, Offset: " << std::dec << frame->map_frame_type.chop_frame.offset_delta <<std::endl;
+    } else if (type == 251) {
+        std::cout << "SAME_FRAME_EXTENDED, Offset: " << std::dec << frame->map_frame_type.same_frame_extended.offset_delta <<std::endl;
+    } else if (type >= 252 && type <= 254) {
+        std::cout << "APPEND, Offset: "  << std::dec << frame->map_frame_type.append_frame.offset_delta<<std::endl;
+        std::cout << "\t\t\t" << "Local verifications: " <<std::endl;
+        for (int i = 0; i < type - 251; i++) {
+            print_verification_type_info(&frame->map_frame_type.append_frame.locals[i], cp);
+        }
+    } else if (type == 255) {
+        std::cout << "FULL_FRAME, Offset: " << std::dec << frame->map_frame_type.full_frame.offset_delta <<std::endl;
+
+        int number_of_locals = static_cast<int>(frame->map_frame_type.full_frame.number_of_locals);
+        std::cout << "\t\t\t" << "Local verifications: " <<std::endl;
+        for (int i = 0; i < number_of_locals; i++) {
+            print_verification_type_info(&frame->map_frame_type.full_frame.locals[i], cp);
+        }
+
+        int number_of_stack_items = static_cast<int>(frame->map_frame_type.full_frame.number_of_stack_items);
+        std::cout << "\t\t\t" << "Stack verifications: " <<std::endl;
+        for (int i = 0; i < number_of_stack_items; i++) {
+            print_verification_type_info(&frame->map_frame_type.full_frame.stack[i], cp);
+        }
+    }
+}
+
+void print_verification_type_info(VerificationTypeInfo *info, cp_info *cp) {
+    int tag = static_cast<int>(info->tag);
+
+    switch(tag) {
+        case 0:
+            std::cout << "\t\t\t" << "\tTOP" << std::endl;
+            break;
+        case 1:
+            std::cout << "\t\t\t" << "\tInteger" << std::endl;
+            break;
+        case 2:
+            std::cout << "\t\t\t" << "\tFloat" << std::endl;
+            break;
+        case 3:
+            std::cout << "\t\t\t" << "\tLong" << std::endl;
+            break;
+        case 4:
+            std::cout << "\t\t\t" << "\tDouble" << std::endl;
+            break;
+        case 5:
+            std::cout << "\t\t\t" << "\tNull" << std::endl;
+            break;
+        case 6:
+            std::cout << "\t\t\t" << "\tUninitializedThis" << std::endl;
+            break;
+        case 7:
+            std::cout << "\t\t\t" << "\tObject:  " << get_cp_string(cp, cp[info->type_info.object_variable_info.cpool_index].info.class_info.name_index)<< std::endl;
+            break;
+        case 8:
+            std::cout << "\t\t\t" << "\tUninitialized, Offset: " << info->type_info.uninitialized_variable_info.offset << std::endl;
+            break;
+    }
+
+}
 
 void print_exception_attribute(Exceptions_attribute *ptr, cp_info *cp, ExcTable* excT) {
   int i = 0;
@@ -303,11 +422,13 @@ void print_linenumber_attribute(LineNumberTable_attribute *ptr) {
   int i = 0;
 
   LineNTable* ptr_crawler = ptr->line_number_table;
+  std::cout << "\t\t LineNumberTable: {\n";
 
   for (; i < ptr->line_number_table_length;i++) {
-    printf("\t\t line %d: %d\n", ptr_crawler->line_number, ptr_crawler->start_pc);
+    printf("\t\t\t line %d: %d\n", ptr_crawler->line_number, ptr_crawler->start_pc);
     ptr_crawler += 1;
   }
+  std::cout << "\t\t}\n";
 }
 
 void print_code_attribute(Code_attribute *ptr, cp_info *cp) {
@@ -406,7 +527,7 @@ void print_code_attribute(Code_attribute *ptr, cp_info *cp) {
     }
 
     for (u4 i = 0; i < ptr->attributes_count; i++) {
-      print_attribute_info(ptr->attributes, cp);
+      print_attribute_info(&ptr->attributes[i], cp);
     }
 }
 
@@ -459,4 +580,38 @@ void print_constantvalue_attribute(ConstantValue_attribute *attr) {
     std::cout << "Attribute Name Index: " << static_cast<int>(attr->attribute_name_index) << ", ";
     std::cout << "Attribute Length: " << static_cast<int>(attr->attribute_length) << ", ";
     std::cout << "Constant Value Index: " << static_cast<int>(attr->constantvalue_index) << "}\n";
+}
+
+void print_java_version (u2 major,  u2 minor) {
+  std::string  major_version = "";
+  switch (major){
+    case 52:
+      major_version = "J2SE 8";
+    break;
+    case 51:
+      major_version = "J2SE 7";
+    break;
+    case 50:
+      major_version = "J2SE 6.0";
+    break;
+    case 49:
+      major_version = "J2SE 5.0";
+    break;
+    case 48:
+      major_version = "JDK 1.4";
+    break;
+    case 47:
+      major_version = "JDK 1.3";
+    break;
+    case 46:
+      major_version = "JDK 1.2";
+    break;
+    case 45:
+      major_version = "JDK 1.1";
+    break;
+    default:
+      major_version = "0";
+    break;
+  }
+  std::cout << "Java Version: " << major_version << "." << minor << std::endl;
 }

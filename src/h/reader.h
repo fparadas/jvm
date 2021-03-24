@@ -240,6 +240,11 @@ void read_method_entry(FILE *fp, method_info *method, cp_info *cp);
 
 
 
+void read_stack_map_frame(FILE *fp, StackMapFrame *stack_map_frame);
+
+void read_verification_type_info (FILE* fp, VerificationTypeInfo *vtype);
+
+
 
 
 

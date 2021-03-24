@@ -1,4 +1,6 @@
 #include "../h/reader.h"
+#include <iostream>
+#include <ostream>
 
 int read_class_file(classfile *file, FILE *fp) {
     // test pointers
@@ -50,11 +52,11 @@ int read_class_file(classfile *file, FILE *fp) {
     }
 
     file->attributes_count = read_u2(fp);
+    std::cout << "attributes_count: " << file->attributes_count <<std::endl;
 
     file->attributes = (attribute_info*) calloc(file->attributes_count, sizeof(attribute_info));
-    if(file->attributes_count > 0) {
-        read_attributes(fp, file->attributes, file->attributes_count, file->cp);
-    }
+
+    read_attributes(fp, file->attributes, file->attributes_count, file->cp);
 
     return 1;
 }
@@ -128,7 +130,10 @@ void read_attribute_info(FILE *fp, attribute_info *att_ptr, cp_info *cp)
     att_ptr->attribute_name_index = read_u2(fp);
     att_ptr->attribute_length = read_u4(fp);
 
+
     char *str = get_cp_string(cp, att_ptr->attribute_name_index);
+
+    std::cout << "Attr: " << str <<std::endl;
 
     if (strcmp("Code", str) == 0)
     {
@@ -141,7 +146,6 @@ void read_attribute_info(FILE *fp, attribute_info *att_ptr, cp_info *cp)
     else if (strcmp("Exceptions", str) == 0)
     {
         read_exceptions_attribute(&att_ptr->info.exceptions, fp);
-        fseek(fp, att_ptr->attribute_length, SEEK_CUR);
     }
     else if (strcmp("LineNumberTable", str) == 0)
     {
@@ -162,9 +166,7 @@ void read_attribute_info(FILE *fp, attribute_info *att_ptr, cp_info *cp)
     }
     else if (strcmp("StackMapTable", str) == 0)
     {
-        fseek(fp, att_ptr->attribute_length, SEEK_CUR);
         read_stackmaptable_attribute(&att_ptr->info.stackmaptable, fp);
-        fseek(fp, att_ptr->attribute_length - 2, SEEK_CUR); /*WARN Talvez o bug esteja aqui*/
     }
     else
     {
@@ -192,6 +194,8 @@ void read_single_field(FILE *fp, field_info *field, cp_info *cp)
     field->name_index = read_u2(fp);
     field->description_index = read_u2(fp);
     field->attribute_count = read_u2(fp);
+
+    std::cout << "attributes_count: " << field->attribute_count <<std::endl;
 
     field->attributes = (attribute_info *) calloc(field->attribute_count, sizeof(attribute_info));
     if (field->attribute_count > 0) {
@@ -362,9 +366,8 @@ void read_sourcefile_attribute(SourceFile_attribute *sourceFile_ptr, FILE *fp) {
     assert(sourceFile_ptr);
     assert(fp);
 
-    sourceFile_ptr->attribute_name_index = read_u2(fp);
-    sourceFile_ptr->attribute_length = read_u4(fp);
     sourceFile_ptr->sourcefile_index = read_u2(fp);
+
 }
 
 void read_innerclasses_attribute(InnerClasses_attribute *innerClass_ptr, FILE *fp) {
@@ -396,9 +399,14 @@ void read_stackmaptable_attribute(StackMapTable_attribute *smt_ptr, FILE *fp) {
     assert(smt_ptr);
     assert(fp);
 
-    smt_ptr->index = read_u2(fp);
-    smt_ptr->length = read_u4(fp);
     smt_ptr->n_entries = read_u2(fp);
+    smt_ptr->stack = (StackMapFrame*) calloc(smt_ptr->n_entries, sizeof(StackMapFrame));
+
+    int n_entries = static_cast<int>(smt_ptr->n_entries);
+
+    for (int i = 0; i < n_entries; i++) {
+        read_stack_map_frame(fp, &smt_ptr->stack[i]);
+    }
 }
 
 void read_interfaces(FILE *fp, CONSTANT_Class_info interfaces[], u2 interfaces_count) {
@@ -422,3 +430,77 @@ void read_method_entry(FILE *fp, method_info *method, cp_info *cp) {
 }
 
 
+void read_stack_map_frame(FILE *fp, StackMapFrame *stack_map_frame) {
+	stack_map_frame->frame_type = read_u1(fp);
+    int type = static_cast<int>(stack_map_frame->frame_type);
+     if (type >= 64 && type <= 127) {
+		stack_map_frame->map_frame_type.same_locals_1_stack_item_frame.stack = (VerificationTypeInfo*) calloc(1, sizeof(VerificationTypeInfo));
+        read_verification_type_info(fp, stack_map_frame->map_frame_type.same_locals_1_stack_item_frame.stack);
+
+	} else if (type == 247) {
+		stack_map_frame->map_frame_type.same_locals_1_stack_item_frame_extended.offset_delta = read_u2(fp);
+
+		stack_map_frame->map_frame_type.same_locals_1_stack_item_frame_extended.stack = (VerificationTypeInfo*)  calloc(1, sizeof(VerificationTypeInfo));
+        read_verification_type_info(fp, stack_map_frame->map_frame_type.same_locals_1_stack_item_frame_extended.stack);
+
+	} else if (type >= 248 && type <= 250) {
+		stack_map_frame->map_frame_type.chop_frame.offset_delta = read_u2(fp);
+
+	} else if (type == 251) {
+		stack_map_frame->map_frame_type.same_frame_extended.offset_delta = read_u2(fp);
+
+	} else if (type >= 252 && type <= 254) {
+		stack_map_frame->map_frame_type.append_frame.offset_delta = read_u2(fp);
+		u2 sizeMalloc = (type - 251);
+
+		stack_map_frame->map_frame_type.append_frame.locals = (VerificationTypeInfo*)  calloc(type - 251, sizeof(VerificationTypeInfo));
+
+		for (int posicao = 0; posicao < sizeMalloc; posicao++) {
+            read_verification_type_info(fp, &stack_map_frame->map_frame_type.append_frame.locals[posicao]);
+		}
+
+	} else if (type == 255) {
+        
+		stack_map_frame->map_frame_type.full_frame.offset_delta = read_u2(fp);
+
+		stack_map_frame->map_frame_type.full_frame.number_of_locals = read_u2(fp);
+
+
+        int number_of_locals = static_cast<int>(stack_map_frame->map_frame_type.full_frame.number_of_locals);
+		if (number_of_locals > 0) {
+			stack_map_frame->map_frame_type.full_frame.locals = (VerificationTypeInfo*) calloc(number_of_locals, sizeof(VerificationTypeInfo));
+
+			for (int posicao = 0; posicao < number_of_locals; posicao++) {
+                read_verification_type_info(fp, &stack_map_frame->map_frame_type.full_frame.locals[posicao]);
+			}
+		}
+
+		stack_map_frame->map_frame_type.full_frame.number_of_stack_items = read_u2(fp);
+        int number_of_stack_items = static_cast<int>(stack_map_frame->map_frame_type.full_frame.number_of_stack_items);
+
+		if (number_of_stack_items > 0) {
+			stack_map_frame->map_frame_type.full_frame.stack = (VerificationTypeInfo*) calloc(number_of_stack_items , sizeof(VerificationTypeInfo));
+
+            for (int posicao = 0; posicao < number_of_stack_items; posicao++) {
+                read_verification_type_info(fp, &stack_map_frame->map_frame_type.full_frame.stack[posicao]);
+			}
+		}
+	}
+}
+
+void read_verification_type_info (FILE* fp, VerificationTypeInfo *vtype) {
+	vtype->tag = read_u1(fp);
+    int tag = static_cast<int>(vtype->tag);
+
+	switch (tag) {
+		case 7:
+			vtype->type_info.object_variable_info.cpool_index = read_u2(fp);
+			break;
+		case 8:
+			vtype->type_info.uninitialized_variable_info.offset = read_u2(fp);
+			break;
+		default:
+			break;
+	}
+
+}

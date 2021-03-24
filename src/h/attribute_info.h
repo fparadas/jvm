@@ -1,5 +1,6 @@
 #pragma once
 #include "utils.h"
+#include "stack_map_frame.h"
 
 struct attribute_info;
 
@@ -79,8 +80,6 @@ typedef struct
 */
 typedef struct
 {
-    u2 attribute_name_index;
-    u4 attribute_length;
     u2 sourcefile_index;
 } SourceFile_attribute;
 
@@ -124,9 +123,8 @@ typedef struct
 */
 typedef struct
 {
-    u2 index;
-    u4 length;
     u2 n_entries;
+    StackMapFrame *stack;
 } StackMapTable_attribute;
 
 /**

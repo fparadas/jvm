@@ -7,38 +7,99 @@ std::vector<u4> acc_flags;
 
 std::string get_flags(std::string access_map, u4 code) {
     std::string res = "";
-    u4 temp = code;
 
-    if (temp % 16 != 0) {
-        if(access_map == "fields") {
-            res = res + ACC_FLAGS_FIELD[temp % 16] + ";";
-        } else if(access_map == "methods") {
-            res = res + ACC_FLAGS_METHOD[temp % 16]+ ";";
-        } else if(access_map == "class") {
-            res = res + ACC_FLAGS_CLASS[temp % 16]+ ";";
-        }
-    }
-
-    if (temp % 256 - temp % 16 != 0) {
-        if(access_map == "fields") {
-            res = res + ACC_FLAGS_FIELD[temp % 256 - temp % 16] + ";";
-        } else if(access_map == "methods") {
-            res = res + ACC_FLAGS_METHOD[temp % 256 - temp % 16]+ ";";
-        } else if(access_map == "class") {
-            res = res + ACC_FLAGS_CLASS[temp % 256 - temp % 16]+ ";";
-        }
-    }
-
-    if (temp % 4096 - temp % 256 != 0) {
-        if(access_map == "fields") {
-            res = res + ACC_FLAGS_FIELD[temp % 4096 - temp % 256] + ";";
-        } else if(access_map == "methods") {
-            res = res + ACC_FLAGS_METHOD[temp % 4096 - temp % 256]+ ";";
-        } else if(access_map == "class") {
-            res = res + ACC_FLAGS_CLASS[temp % 4096 - temp % 256]+ ";";
-        }
+    if (access_map == "fields") {
+        return get_fields_flags(code);
+    } else if (access_map == "methods") {
+        return get_methods_flags(code);
+    } else if (access_map == "class") {
+        return get_class_flags(code);
     }
     
+    return res;
+}
+
+std::string get_fields_flags(u4 code) {
+    std::string res = "";
+    if (code % 16 != 0) {
+        if ((code % 16) % 2 == 1) {
+            res = res + get_fields_flags((code % 16) - 1) + ";" + ACC_FLAGS_FIELD[1] + ";";
+        } else {
+            res = res + ACC_FLAGS_FIELD[code % 16] + ";";
+        }
+    }
+
+    if (code % 256 - code % 16 != 0) {
+        if (((code % 256 - code % 16)/16) % 2 == 1) {
+            res = res + get_fields_flags((code % 256 - code % 16) - 16) + ";" + ACC_FLAGS_FIELD[16] + ";";
+        } else {
+            res = res + ACC_FLAGS_FIELD[code % 256 - code % 16] + ";";
+        }
+    }
+
+    if (code % 4096 - code % 256 != 0) {
+        if (((code % 4096 - code % 256)/256) % 2 == 1) {
+            res = res + get_fields_flags((code % 4096 - code % 256) - 256) + ";" + ACC_FLAGS_FIELD[256] + ";";
+        } else {
+            res = res + ACC_FLAGS_FIELD[code % 4096 - code % 256] + ";";
+        }
+    }
+    return res;
+}
+
+std::string get_methods_flags(u4 code) {
+    std::string res = "";
+    if (code % 16 != 0) {
+        if ((code % 16) % 2 == 1) {
+            res = res + get_methods_flags((code % 16) - 1) + ";" + ACC_FLAGS_METHOD[1] + ";";
+        } else {
+            res = res + ACC_FLAGS_METHOD[code % 16] + ";";
+        }
+    }
+
+    if (code % 256 - code % 16 != 0) {
+        if (((code % 256 - code % 16)/16) % 2 == 1) {
+            res = res + get_methods_flags((code % 256 - code % 16) - 16) + ";" + ACC_FLAGS_METHOD[16] + ";";
+        } else {
+            res = res + ACC_FLAGS_METHOD[code % 256 - code % 16] + ";";
+        }
+    }
+
+    if (code % 4096 - code % 256 != 0) {
+        if (((code % 4096 - code % 256)/256) % 2 == 1) {
+            res = res + get_methods_flags((code % 4096 - code % 256) - 256) + ";" + ACC_FLAGS_METHOD[256] + ";";
+        } else {
+            res = res + ACC_FLAGS_METHOD[code % 4096 - code % 256] + ";";
+        }
+    }
+    return res;
+}
+
+std::string get_class_flags(u4 code) {
+    std::string res = "";
+    if (code % 16 != 0) {
+        if ((code % 16) % 2 == 1) {
+            res = res + get_class_flags((code % 16) - 1) + ";" + ACC_FLAGS_CLASS[1] + ";";
+        } else {
+            res = res + ACC_FLAGS_CLASS[code % 16] + ";";
+        }
+    }
+
+    if (code % 256 - code % 16 != 0) {
+        if (((code % 256 - code % 16)/16) % 2 == 1) {
+            res = res + get_class_flags((code % 256 - code % 16) - 16) + ";" + ACC_FLAGS_CLASS[16] + ";";
+        } else {
+            res = res + ACC_FLAGS_CLASS[code % 256 - code % 16] + ";";
+        }
+    }
+
+    if (code % 4096 - code % 256 != 0) {
+        if (((code % 4096 - code % 256)/256) % 2 == 1) {
+            res = res + get_class_flags((code % 4096 - code % 256) - 256) + ";" + ACC_FLAGS_CLASS[256] + ";";
+        } else {
+            res = res + ACC_FLAGS_CLASS[code % 4096 - code % 256] + ";";
+        }
+    }
     return res;
 }
 
