@@ -135,3 +135,72 @@ void read_single_field(FILE *fp, field_info *field, cp_info *cp);
 * @param cp pointer to the constant info structure
 */
 void read_fields(FILE *fp, field_info fields[], u2 fields_count, cp_info *cp);
+
+/**
+* Reads Code attribute table.
+*
+* @param code_ptr pointer to the Code attribute structure
+* @param fp pointer the to .class file
+* @param cp pointer to the constant info structure
+*/
+void read_code_attribute(Code_attribute* code_ptr, FILE* fp, cp_info* cp);
+
+/**
+* Reads Constant value attribute table.
+*
+* @param constValue_ptr pointer to the constant value attribute structure
+* @param fp pointer the to .class file
+*/
+void read_constantvalue_attribute(ConstantValue_attribute *constValue_ptr, FILE *fp);
+
+/**
+* Reads Exceptions attribute table.
+*
+* @param excp_ptr pointer to the exceptions attribute structure
+* @param fp pointer the to .class file
+*/
+void read_exceptions_attribute(Exceptions_attribute *excp_ptr, FILE *fp);
+
+/**
+* Reads Line number table.
+*
+* @param lineNum_ptr pointer to the line number table
+* @param fp pointer the to .class file
+*/
+void read_linenumbertable_attribute(LineNumberTable_attribute *lineNum_ptr, FILE *fp);
+
+/**
+* Reads source file table.
+*
+* @param sourceFile_ptr pointer to the source file attribute table
+* @param fp pointer the to .class file
+*/
+void read_sourcefile_attribute(SourceFile_attribute *sourceFile_ptr, FILE *fp);
+
+/**
+* Reads inner classes table.
+*
+* @param innerClass_ptr pointer to the inner classes table
+* @param fp pointer the to .class file
+*/
+void read_innerclasses_attribute(InnerClasses_attribute *innerClass_ptr, FILE *fp);
+
+/**
+* Reads synthetic attribute table.
+*
+* @param synthetic_ptr pointer to the synthetic attribute table
+* @param fp pointer the to .class file
+*/
+void read_synthetic_attribute(attribute_info *synthetic_ptr, FILE *fp);
+
+/**
+* Reads stack map table.
+*
+* @param smt_ptr pointer to the stack map table
+* @param fp pointer the to .class file
+*/
+void read_stackmaptable_attribute(StackMapTable_attribute *smt_ptr, FILE *fp);
+
+
+
+
