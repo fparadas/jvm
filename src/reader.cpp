@@ -242,7 +242,7 @@ void read_code_attribute(Code_attribute* code_ptr, FILE* fp, cp_info* cp){
     }
 
     code_ptr->exception_table_length = read_u2(fp);
-    code_ptr->exception_table = calloc(4*sizeof(u2), ptr->exception_table_length);
+    code_ptr->exception_table = calloc(4*sizeof(u2), code_ptr->exception_table_length);
     for(i = 0; i < code_ptr->exception_table_length; i++) {
         code_ptr->exception_table[i].start_pc = read_u2(fp);
         code_ptr->exception_table[i].end_pc = read_u2(fp);
