@@ -27,7 +27,8 @@ RM = del
 #
 # Compilation and linking
 #
-all: ${CC} $(CC_FLAGS) src/cpp/*.cpp src/h/*.h -o $(PROJ_NAME).exe
+all: 
+	@ ${CC} $(CC_FLAGS) src/cpp/*.cpp src/h/*.h -o $(PROJ_NAME).exe
 
 clean:
 	@ $(RM) $(PROJ_NAME).exe
