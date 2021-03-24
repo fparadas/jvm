@@ -1,5 +1,53 @@
 #include "../h/reader.h"
 
+void read_class_file(classfile *file, FILE *fp) {
+    // test pointers
+    assert(file);
+    assert(fp);
+
+    file->magic = read_u4(fp);
+    if(file->magic != 0xcafebabe) {
+        std::cout << "This file is not a valid class file!" << std::endl;
+        return;
+    }
+    file->minor_version = read_u2(fp);
+    file->major_version = read_u2(fp);
+
+    file->cp_count = read_u2(fp);
+    file->cp = (cp_info*) calloc(sizeof(cp_info), file->cp_count);
+
+    read_cp_info(file->cp, file->cp_count, fp);
+
+    file->access_flags = read_u2(fp);
+    file->this_class = read_u2(fp);
+    file->super_class = read_u2(fp);
+
+    file->interfaces_count = read_u2(fp);
+    file->interfaces = (interface_info*) calloc(sizeof(interface_info), file->interfaces_count);
+    if (file->interfaces_count > 0) {
+        read_interfaces(fp, file->interfaces, file->interfaces_count);
+    }
+
+    file->fields_count = read_u2(fp);
+    file->fields = (field_info*) calloc(sizeof(field_info), file->fields_count);
+    if (file->fields_count > 0) {
+        read_fields(fp, file->fields, file->fields_count, file->cp);
+    }
+
+    file->methods_count = read_u2(fp);
+    file->methods = (method_info*) calloc(sizeof(method_info), file->methods_count);
+
+    if(file->methods_count > 0) {
+        read_methods(fp, file->methods, file->methods_count, file->cp);
+    }
+
+    file->attributes_count = read_u2(fp);
+    file->attributes = (attribute_info*) calloc(sizeof(attribute_info), file->attributes_count);
+    if(file->attributes_count > 0) {
+        read_attributes(fp, file->attributes, file->attributes_count, file->cp);
+    }
+}
+
 void read_cp_info(cp_info cp[], int cp_count, FILE *fp) {
     for (int i=1; i < cp_count; i++) {
         cp_info *ptr = &cp[i];
@@ -338,7 +386,7 @@ void read_stackmaptable_attribute(StackMapTable_attribute *smt_ptr, FILE *fp) {
     smt_ptr->n_entries = read_u2(fp);
 }
 
-void read_interfaces(FILE *fp, CONSTANT_Class_info interfaces[], uint16_t interfaces_count) {
+void read_interfaces(FILE *fp, CONSTANT_Class_info interfaces[], u2 interfaces_count) {
   int i;
   for (i = 0; i < interfaces_count; i++) {
     CONSTANT_Class_info *ptr = &interfaces[i];

@@ -6,6 +6,13 @@
 #include <cstdlib>
 
 /**
+ * @brief Reads the class file's content
+ * @param file pointer to the structure where the content will be stored
+ * @param fp pointer to the .class file.
+ */
+void read_class_file(classfile *file, FILE *fp);
+
+/**
  * @brief Reads the class file's constant pool.
  * @param cp array to where the pool will be stored.
  * @param cp_count size of the constant pool.
