@@ -41,7 +41,7 @@ $(PROJ_NAME): $(OBJ)
 	@ echo ' '
  
 ./objects/cpp/main.o: ./src/cpp/main.cpp $(H_SOURCE)
-	@ echo 'Building target using GCC compiler: $<'
+	@ echo 'Building target using G++ compiler: $<'
 	$(CC) $< $(CC_FLAGS) -o $@
 	@ echo ' '
  

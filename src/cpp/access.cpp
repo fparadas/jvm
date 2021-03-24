@@ -7,15 +7,34 @@ std::vector<u4> acc_flags;
 
 std::string get_flags(std::string access_map, u4 code) {
     std::string res = "";
-    for (int i = 0; i < acc_flags.size(); i ++) {
-        if (acc_flags[i] && code == acc_flags[i]) {
-            if(access_map == "fields") {
-                res = res + ", "  + ACC_FLAGS_FIELD[code];
-            } else if(access_map == "methods") {
-                res = res + ", "  + ACC_FLAGS_METHOD[code];
-            } else if(access_map == "class") {
-                res = res + ", "  + ACC_FLAGS_CLASS[code];
-            }
+    u4 temp = code;
+    if (temp % 16 != 0) {
+        if(access_map == "fields") {
+            res = res + ACC_FLAGS_FIELD[temp % 16] + ";";
+        } else if(access_map == "methods") {
+            res = res + ACC_FLAGS_METHOD[temp % 16]+ ";";
+        } else if(access_map == "class") {
+            res = res + ACC_FLAGS_CLASS[temp % 16]+ ";";
+        }
+    }
+
+    if (temp % 256 - temp % 16 != 0) {
+        if(access_map == "fields") {
+            res = res + ACC_FLAGS_FIELD[temp % 256 - temp % 16] + ";";
+        } else if(access_map == "methods") {
+            res = res + ACC_FLAGS_METHOD[temp % 256 - temp % 16]+ ";";
+        } else if(access_map == "class") {
+            res = res + ACC_FLAGS_CLASS[temp % 256 - temp % 16]+ ";";
+        }
+    }
+
+    if (temp % 4096 - temp % 256 != 0) {
+        if(access_map == "fields") {
+            res = res + ACC_FLAGS_FIELD[temp % 4096 - temp % 256] + ";";
+        } else if(access_map == "methods") {
+            res = res + ACC_FLAGS_METHOD[temp % 4096 - temp % 256]+ ";";
+        } else if(access_map == "class") {
+            res = res + ACC_FLAGS_CLASS[temp % 4096 - temp % 256]+ ";";
         }
     }
     
@@ -55,27 +74,27 @@ void populate_acc_class_map() {
 }
 
 void populate_acc_fields_map() {
-    ACC_FLAGS_CLASS[ACC_PUBLIC] = "ACC_PUBLIC";
-    ACC_FLAGS_CLASS[ACC_PRIVATE] = "ACC_PRIVATE";
-    ACC_FLAGS_CLASS[ACC_PROTECTED] = "ACC_PROTECTED";
-    ACC_FLAGS_CLASS[ACC_STATIC] = "ACC_STATIC";
-    ACC_FLAGS_CLASS[ACC_VOLATILE] = "ACC_VOLATILE";
-    ACC_FLAGS_CLASS[ACC_TRANSIENT] = "ACC_TRANSIENT";
-    ACC_FLAGS_CLASS[ACC_SYNTHETIC] = "ACC_SYNTHETIC";
-    ACC_FLAGS_CLASS[ACC_ENUM] = "ACC_ENUM";
+    ACC_FLAGS_FIELD[ACC_PUBLIC] = "ACC_PUBLIC";
+    ACC_FLAGS_FIELD[ACC_PRIVATE] = "ACC_PRIVATE";
+    ACC_FLAGS_FIELD[ACC_PROTECTED] = "ACC_PROTECTED";
+    ACC_FLAGS_FIELD[ACC_STATIC] = "ACC_STATIC";
+    ACC_FLAGS_FIELD[ACC_VOLATILE] = "ACC_VOLATILE";
+    ACC_FLAGS_FIELD[ACC_TRANSIENT] = "ACC_TRANSIENT";
+    ACC_FLAGS_FIELD[ACC_SYNTHETIC] = "ACC_SYNTHETIC";
+    ACC_FLAGS_FIELD[ACC_ENUM] = "ACC_ENUM";
 }
 
 void populate_acc_methods_map() {
-    ACC_FLAGS_CLASS[ACC_PUBLIC] = "ACC_PUBLIC";
-    ACC_FLAGS_CLASS[ACC_PRIVATE] = "ACC_PRIVATE";
-    ACC_FLAGS_CLASS[ACC_PROTECTED] = "ACC_PROTECTED";
-    ACC_FLAGS_CLASS[ACC_STATIC] = "ACC_STATIC";
-    ACC_FLAGS_CLASS[ACC_FINAL] = "ACC_FINAL";
-    ACC_FLAGS_CLASS[ACC_SYNCHRONIZED] = "ACC_SYNCHRONIZED";
-    ACC_FLAGS_CLASS[ACC_BRIDGE] = "ACC_BRIDGE";
-    ACC_FLAGS_CLASS[ACC_VARARGS] = "ACC_VARARGS";
-    ACC_FLAGS_CLASS[ACC_NATIVE] = "ACC_NATIVE";
-    ACC_FLAGS_CLASS[ACC_ABSTRACT] = "ACC_ABSTRACT";
-    ACC_FLAGS_CLASS[ACC_STRICT] = "ACC_STRICT";
-    ACC_FLAGS_CLASS[ACC_SYNTHETIC] = "ACC_SYNTHETIC";
+    ACC_FLAGS_METHOD[ACC_PUBLIC] = "ACC_PUBLIC";
+    ACC_FLAGS_METHOD[ACC_PRIVATE] = "ACC_PRIVATE";
+    ACC_FLAGS_METHOD[ACC_PROTECTED] = "ACC_PROTECTED";
+    ACC_FLAGS_METHOD[ACC_STATIC] = "ACC_STATIC";
+    ACC_FLAGS_METHOD[ACC_FINAL] = "ACC_FINAL";
+    ACC_FLAGS_METHOD[ACC_SYNCHRONIZED] = "ACC_SYNCHRONIZED";
+    ACC_FLAGS_METHOD[ACC_BRIDGE] = "ACC_BRIDGE";
+    ACC_FLAGS_METHOD[ACC_VARARGS] = "ACC_VARARGS";
+    ACC_FLAGS_METHOD[ACC_NATIVE] = "ACC_NATIVE";
+    ACC_FLAGS_METHOD[ACC_ABSTRACT] = "ACC_ABSTRACT";
+    ACC_FLAGS_METHOD[ACC_STRICT] = "ACC_STRICT";
+    ACC_FLAGS_METHOD[ACC_SYNTHETIC] = "ACC_SYNTHETIC";
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "dotclass.h"
 #include "utils.h"
+#include "access.h"
 #include "getter.h"
 #include <string.h>
 #include <cstdlib>
@@ -10,7 +11,7 @@
  * @param file pointer to the structure where the content will be stored
  * @param fp pointer to the .class file.
  */
-void read_class_file(classfile *file, FILE *fp);
+int read_class_file(classfile *file, FILE *fp);
 
 /**
  * @brief Reads the class file's constant pool.

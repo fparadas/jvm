@@ -1,10 +1,11 @@
 #include "../h/getter.h"
+#include <typeinfo>
 
 char *get_cp_string(cp_info *cp, u2 index) {
     assert(cp);
 
     cp_info *entry = &cp[index];
-    assert(entry->tag == CONSTANT_Utf8);
+    assert(entry->tag == static_cast<u1>(CONSTANT_Utf8));
 
     return (char *) entry->info.utf8_info.bytes;
 }

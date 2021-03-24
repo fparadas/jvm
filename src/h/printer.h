@@ -17,6 +17,11 @@
 void print_summary(classfile* cf);
 
 /**
+ * @brief Prints all classfile info.
+ * @param cf classfile
+ */
+void print_all(classfile *cf);
+/**
  * @brief Prints constant pool detail.
  * @param cf classfile
  */

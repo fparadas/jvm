@@ -6,8 +6,8 @@ void print_summary(classfile *cf) {
 
     std::cout << "magic: " << std::hex<<static_cast<int>(cf->magic) << "\n";
 
-    std::cout << "major: " << std::hex<<static_cast<int>(cf->major_version) << "\n"; 
-    std::cout << "minor: " << std::hex<<static_cast<int>(cf->minor_version) << "\n"; 
+    std::cout << "major: " << std::dec<< cf->major_version << "\n"; 
+    std::cout << "minor: " << std::dec<< cf->minor_version << "\n"; 
 
     std::cout << "cp_count: " << static_cast<int>(cf->cp_count) << "\n";
 
@@ -34,8 +34,8 @@ void print_all(classfile *cf) {
 
     std::cout << "magic: " << std::hex<<static_cast<int>(cf->magic) << "\n";
 
-    std::cout << "major: " << std::hex<<static_cast<int>(cf->major_version) << "\n"; 
-    std::cout << "minor: " << std::hex<<static_cast<int>(cf->minor_version) << "\n"; 
+    std::cout << "major: " << std::dec<<static_cast<int>(cf->major_version) << "\n"; 
+    std::cout << "minor: " << std::dec<<static_cast<int>(cf->minor_version) << "\n"; 
 
     std::cout << "cp_count: " << static_cast<int>(cf->cp_count) << "\n";
     print_cp_info(cf);

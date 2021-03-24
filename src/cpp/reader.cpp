@@ -1,6 +1,6 @@
 #include "../h/reader.h"
 
-void read_class_file(classfile *file, FILE *fp) {
+int read_class_file(classfile *file, FILE *fp) {
     // test pointers
     assert(file);
     assert(fp);
@@ -8,56 +8,68 @@ void read_class_file(classfile *file, FILE *fp) {
     file->magic = read_u4(fp);
     if(file->magic != 0xcafebabe) {
         std::cout << "This file is not a valid class file!" << std::endl;
-        return;
+        return 0;
     }
+
     file->minor_version = read_u2(fp);
     file->major_version = read_u2(fp);
 
     file->cp_count = read_u2(fp);
-    file->cp = (cp_info*) calloc(sizeof(cp_info), file->cp_count);
+
+    file->cp = (cp_info*) calloc(file->cp_count, sizeof(cp_info));
 
     read_cp_info(file->cp, file->cp_count, fp);
 
     file->access_flags = read_u2(fp);
+    
+
     file->this_class = read_u2(fp);
+
     file->super_class = read_u2(fp);
 
     file->interfaces_count = read_u2(fp);
-    file->interfaces = (interface_info*) calloc(sizeof(interface_info), file->interfaces_count);
+
+    file->interfaces = (interface_info*) calloc(file->interfaces_count, sizeof(interface_info));
     if (file->interfaces_count > 0) {
         read_interfaces(fp, file->interfaces, file->interfaces_count);
     }
 
     file->fields_count = read_u2(fp);
-    file->fields = (field_info*) calloc(sizeof(field_info), file->fields_count);
+
+    file->fields = (field_info*) calloc(file->fields_count, sizeof(field_info));
     if (file->fields_count > 0) {
         read_fields(fp, file->fields, file->fields_count, file->cp);
     }
 
     file->methods_count = read_u2(fp);
-    file->methods = (method_info*) calloc(sizeof(method_info), file->methods_count);
+
+    file->methods = (method_info*) calloc(file->methods_count, sizeof(method_info));
 
     if(file->methods_count > 0) {
         read_methods(fp, file->methods, file->methods_count, file->cp);
     }
 
     file->attributes_count = read_u2(fp);
-    file->attributes = (attribute_info*) calloc(sizeof(attribute_info), file->attributes_count);
+
+    file->attributes = (attribute_info*) calloc(file->attributes_count, sizeof(attribute_info));
     if(file->attributes_count > 0) {
         read_attributes(fp, file->attributes, file->attributes_count, file->cp);
     }
+
+    return 1;
 }
 
 void read_cp_info(cp_info cp[], int cp_count, FILE *fp) {
     for (int i=1; i < cp_count; i++) {
         cp_info *ptr = &cp[i];
         ptr->tag = read_u1(fp);
-
+        
         read_constant_info(ptr->tag, &ptr->info, fp);
 
-        if (ptr->tag == CONSTANT_Double || CONSTANT_Long) {
+        if (static_cast<int>(ptr->tag) == CONSTANT_Double || static_cast<int>(ptr->tag) == CONSTANT_Long) {
             i++;
         }
+
     }
 }
 
@@ -65,7 +77,7 @@ void read_constant_info(u1 tag, CONSTANT_info *ptr, FILE *fp) {
     assert(ptr);
     assert(fp);
 
-    switch(tag) {
+    switch(static_cast<int>(tag)) {
         case CONSTANT_Utf8:
             read_utf8(&ptr->utf8_info, fp);
             break;
@@ -162,11 +174,10 @@ void read_attribute_info(FILE *fp, attribute_info *att_ptr, cp_info *cp)
 
 void read_attributes(FILE *fp, attribute_info attributes[], u2 attributes_count, cp_info *cp)
 {
-    int i = 0;
+    u2 i = 0;
     for (i = 0; i < attributes_count; i++)
     {
-        attribute_info *attr = &attributes[i];
-        read_attribute_info(fp, attr, cp);
+        read_attribute_info(fp, &attributes[i], cp);
     }
 }
 
@@ -182,8 +193,11 @@ void read_single_field(FILE *fp, field_info *field, cp_info *cp)
     field->description_index = read_u2(fp);
     field->attribute_count = read_u2(fp);
 
-    field->attributes = (attribute_info *)calloc(sizeof(attribute_info), field->attribute_count);
-    read_attributes(fp, field->attributes, field->attribute_count, cp);
+    field->attributes = (attribute_info *) calloc(field->attribute_count, sizeof(attribute_info));
+    if (field->attribute_count > 0) {
+        read_attributes(fp, field->attributes, field->attribute_count, cp);
+    }
+
 }
 
 void read_fields(FILE *fp, field_info fields[], u2 fields_count, cp_info *cp)
@@ -203,7 +217,7 @@ void read_utf8(CONSTANT_Utf8_info *ptr, FILE *fp) {
     ptr->length = read_u2(fp);
     ptr->bytes = (u1*) calloc(ptr->length+1, sizeof(u1));
     assert(ptr->bytes);
-    fread(ptr->bytes, sizeof(u1), ptr->length, fp); //#TODO checar se não precisa trocar endian
+    fread(ptr->bytes, sizeof(u1), ptr->length, fp);
 }
 
 void read_integer(CONSTANT_Integer_info *ptr, FILE *fp) {
@@ -282,7 +296,7 @@ void read_code_attribute(Code_attribute* code_ptr, FILE* fp, cp_info* cp){
     code_ptr->max_locals = read_u2(fp);
     code_ptr->code_length = read_u4(fp);
 
-    code_ptr->code = (u1*) calloc(sizeof(u1), code_ptr->code_length);
+    code_ptr->code = (u1*) calloc(code_ptr->code_length, sizeof(u1));
     assert(code_ptr->code);
     int i;
     for(i = 0; i < code_ptr->code_length; i++) {
@@ -290,7 +304,7 @@ void read_code_attribute(Code_attribute* code_ptr, FILE* fp, cp_info* cp){
     }
 
     code_ptr->exception_table_length = read_u2(fp);
-    code_ptr->exception_table = (ExcTable*) calloc(4*sizeof(u2), code_ptr->exception_table_length);
+    code_ptr->exception_table = (ExcTable*) calloc(code_ptr->exception_table_length, 4*sizeof(u2));
     for(i = 0; i < code_ptr->exception_table_length; i++) {
         code_ptr->exception_table[i].start_pc = read_u2(fp);
         code_ptr->exception_table[i].end_pc = read_u2(fp);
@@ -299,6 +313,7 @@ void read_code_attribute(Code_attribute* code_ptr, FILE* fp, cp_info* cp){
     }
 
     code_ptr->attributes_count = read_u2(fp);
+    code_ptr->attributes = (attribute_info*) calloc(code_ptr->attributes_count, sizeof(attribute_info));
     for(i = 0; i < code_ptr->attributes_count; i++) {
         read_attribute_info(fp, &code_ptr->attributes[i], cp);
     }
@@ -320,7 +335,7 @@ void read_exceptions_attribute(Exceptions_attribute *excp_ptr, FILE *fp) {
     assert(fp);
 
     excp_ptr->number_of_exceptions = read_u2(fp);
-    excp_ptr->exception_index_table = (u2*) calloc(sizeof(u2), excp_ptr->number_of_exceptions);
+    excp_ptr->exception_index_table = (u2*) calloc(excp_ptr->number_of_exceptions, sizeof(u2));
     int i;
     for(i = 0; i < excp_ptr->number_of_exceptions; i++) {
         excp_ptr->exception_index_table[i] = read_u2(fp);
@@ -333,7 +348,7 @@ void read_linenumbertable_attribute(LineNumberTable_attribute *lineNum_ptr, FILE
     assert(fp);
 
     lineNum_ptr->line_number_table_length = read_u2(fp);
-    lineNum_ptr->line_number_table = (LineNTable*) calloc(2*sizeof(u2), lineNum_ptr->line_number_table_length);
+    lineNum_ptr->line_number_table = (LineNTable*) calloc( lineNum_ptr->line_number_table_length, 2*sizeof(u2));
 
     int i;
     for (i = 0; i < lineNum_ptr->line_number_table_length; i++) {
@@ -358,7 +373,7 @@ void read_innerclasses_attribute(InnerClasses_attribute *innerClass_ptr, FILE *f
     assert(fp);
 
     innerClass_ptr->number_of_classes = read_u2(fp);
-    innerClass_ptr->classes = (ClassesIn*) calloc(4*sizeof(u2), innerClass_ptr->number_of_classes);
+    innerClass_ptr->classes = (ClassesIn*) calloc(innerClass_ptr->number_of_classes, 4*sizeof(u2));
 
     int i;
     for (i = 0; i < innerClass_ptr->number_of_classes; i++) {

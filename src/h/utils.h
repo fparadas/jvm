@@ -3,9 +3,9 @@
 #include <iostream>
 #include <stdint.h>
 
-typedef uint8_t u1;
-typedef uint16_t u2;
-typedef uint32_t u4;
+typedef unsigned char u1;
+typedef unsigned short u2;
+typedef unsigned int u4;
 
 /**
  * Returns the 16-bit input with switched endianness.
