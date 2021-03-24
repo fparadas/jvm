@@ -1,4 +1,4 @@
-#include "getter.h"
+#include "../h/getter.h"
 
 char *get_cp_string(cp_info *cp, u2 index) {
     assert(cp);

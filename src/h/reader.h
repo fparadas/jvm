@@ -1,8 +1,9 @@
 #pragma once
-#include "types/dotclass.h"
+#include "dotclass.h"
 #include "utils.h"
 #include "getter.h"
 #include <string.h>
+#include <cstdlib>
 
 /**
  * @brief Reads the class file's constant pool.

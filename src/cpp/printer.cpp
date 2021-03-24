@@ -1,6 +1,4 @@
-#include "printer.h"
-#include "getter.h"
-#include <iostream>
+#include "../h/printer.h"
 
 void print_summary(classfile *cf) {
     if (!cf) return;
@@ -181,4 +179,8 @@ void print_methods_info(classfile *cf) {
     }
 
     std::cout << "}\n";
+}
+
+void print_attribute_info(attribute_info *ptr, cp_info *cp) {
+    std::cout << "undefined";
 }

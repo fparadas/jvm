@@ -1,11 +1,12 @@
 #pragma once
 #include "utils.h"
-#include "types/dotclass.h"
-#include "types/access.h"
+#include "dotclass.h"
+#include "access.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "getter.h"
 #include <string.h>
+#include <iostream>
 
 /**
  * @brief Prints classfile summary.

@@ -1,4 +1,4 @@
-#include "access.h"
+#include "../h/access.h"
 
 std::map<u4, std::string> ACC_FLAGS_FIELD;
 std::map<u4, std::string> ACC_FLAGS_METHOD;

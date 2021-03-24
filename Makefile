@@ -1,19 +1,55 @@
+# Name of the project
+PROJ_NAME=JVM
  
+# .c files
+C_SOURCE=$(wildcard ./src/cpp/*.cpp)
+ 
+# .h files
+H_SOURCE=$(wildcard ./src/h/*.h)
+ 
+# Object files
+OBJ=$(subst .cpp,.o,$(subst src,objects,$(C_SOURCE)))
+ 
+# Compiler and linker
 CC=g++
-CFLAGS= -g -ansi -I. -UDEBUG
-DEPS = src/types/access.h src/types/attribute_info.h src/types/constant_info.h src/types/dotclass.h src/types/field_info.h src/types/method_info.h src/getter.h src/printer.h src/reader.h src/utils.h
-OBJ = access.o attribute_info.o constant_info.o dotclass.o field_info.o method_info.o getter.o printer.o reader.o utils.o
-MAINSRC = main.cpp
-
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-all: main.out
-
-main.out: $(OBJ)
-	$(CC) -o $@ $(MAINSRC) $^ $(CFLAGS)
-
-.PHONY: clean
-
+ 
+# Flags for compiler
+CC_FLAGS=-c         \
+         -W         \
+         -Wall      \
+         -ansi      \
+         -pedantic	\
+		 -std=c++11
+ 
+# Command used at clean target
+RM = rm -rf
+ 
+#
+# Compilation and linking
+#
+all: objFolder $(PROJ_NAME)
+ 
+$(PROJ_NAME): $(OBJ)
+	@ echo 'Building binary using GCC linker: $@'
+	$(CC) $^ -o $@
+	@ echo 'Finished building binary: $@'
+	@ echo ' '
+ 
+./objects/cpp/%.o: ./src/cpp/%.cpp ./src/h/%.h
+	@ echo 'Building target using GCC compiler: $<'
+	$(CC) $< $(CC_FLAGS) -o $@
+	@ echo ' '
+ 
+./objects/cpp/main.o: ./src/cpp/main.cpp $(H_SOURCE)
+	@ echo 'Building target using GCC compiler: $<'
+	$(CC) $< $(CC_FLAGS) -o $@
+	@ echo ' '
+ 
+objFolder:
+	@ mkdir -p objects
+ 
 clean:
-	rm -f *.out *.o *.exe
+	@ $(RM) ./objects/*.o $(PROJ_NAME) *~
+	@ rmdir objects
+ 
+.PHONY: all clean

@@ -1,5 +1,5 @@
 #pragma once
-#include "../utils.h"
+#include "utils.h"
 #include <assert.h>
 
 #define CONSTANT_Utf8                 1

@@ -1,6 +1,6 @@
 #pragma once
 #include "utils.h"
-#include "types/dotclass.h"
+#include "dotclass.h"
 
 
 /**

@@ -1,4 +1,4 @@
-#include "reader.h"
+#include "../h/reader.h"
 
 void read_cp_info(cp_info cp[], int cp_count, FILE *fp) {
     for (int i=1; i < cp_count; i++) {
