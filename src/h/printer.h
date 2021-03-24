@@ -10,6 +10,9 @@
 #include <iostream>
 #include "opcodes.h"
 #include <inttypes.h>
+
+#define PRIu16   "u"
+
 /**
  * @brief Prints classfile summary.
  * @param cf classfile

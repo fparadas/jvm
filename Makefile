@@ -8,49 +8,28 @@ C_SOURCE=$(wildcard ./src/cpp/*.cpp)
 H_SOURCE=$(wildcard ./src/h/*.h)
  
 # Object files
-OBJ=$(subst .cpp,.o,$(subst src,objects,$(C_SOURCE)))
+OBJ=$(subst .cpp,.exe,$(subst src,objects,$(C_SOURCE)))
  
 # Compiler and linker
 CC=g++
  
 # Flags for compiler
-CC_FLAGS=-c         \
-         -W         \
+CC_FLAGS=-W         \
          -Wall      \
          -ansi      \
          -pedantic	\
 		 -std=c++11
  
 # Command used at clean target
-RM = rm -rf
+RM = del
  
 #
 # Compilation and linking
 #
-all: objFolder $(PROJ_NAME)
- 
-$(PROJ_NAME): $(OBJ)
-	@ echo 'Building binary using GCC linker: $@'
-	$(CC) $^ -o $@
-	@ echo 'Finished building binary: $@'
-	@ echo ' '
- 
-./objects/cpp/%.o: ./src/cpp/%.cpp ./src/h/%.h
-	@ echo 'Building target using GCC compiler: $<'
-	$(CC) $< $(CC_FLAGS) -o $@
-	@ echo ' '
- 
-./objects/cpp/main.o: ./src/cpp/main.cpp $(H_SOURCE)
-	@ echo 'Building target using G++ compiler: $<'
-	$(CC) $< $(CC_FLAGS) -o $@
-	@ echo ' '
- 
-objFolder:
-	@ mkdir -p objects
-	@ mkdir -p objects/cpp
- 
+all: 
+	@ ${CC} $(CC_FLAGS) src/cpp/*.cpp src/h/*.h -o $(PROJ_NAME).exe
+
 clean:
-	@ $(RM) ./objects/cpp/*.o $(PROJ_NAME) *~
-	@ $(RM) objects
+	@ $(RM) $(PROJ_NAME).exe
  
 .PHONY: all clean
