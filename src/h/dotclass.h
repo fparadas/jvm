@@ -1,3 +1,4 @@
+#pragma once
 #include "constant_info.h"
 #include "field_info.h"
 #include "method_info.h"
