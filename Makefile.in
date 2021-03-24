@@ -14,8 +14,7 @@ OBJ=$(subst .cpp,.exe,$(subst src,objects,$(C_SOURCE)))
 CC=g++
  
 # Flags for compiler
-CC_FLAGS=-c         \
-         -W         \
+CC_FLAGS=-W         \
          -Wall      \
          -ansi      \
          -pedantic	\
