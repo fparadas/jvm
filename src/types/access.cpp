@@ -3,22 +3,44 @@
 std::map<u4, std::string> ACC_FLAGS_FIELD;
 std::map<u4, std::string> ACC_FLAGS_METHOD;
 std::map<u4, std::string> ACC_FLAGS_CLASS;
+std::vector<u4> acc_flags;
 
-void print_flags(std::string access_map, u4 code) {
-    if(access_map == "fields") {
-        std::cout << ACC_FLAGS_FIELD[code] << "\n";
-    } else if(access_map == "methods") {
-        std::cout << ACC_FLAGS_METHOD[code] << "\n";
-    } else if(access_map == "class") {
-        std::cout << ACC_FLAGS_CLASS[code] << "\n";
+std::string get_flags(std::string access_map, u4 code) {
+    std::string res = "";
+    for (int i = 0; i < acc_flags.size(); i ++) {
+        if (acc_flags[i] && code == acc_flags[i]) {
+            if(access_map == "fields") {
+                res = res + ", "  + ACC_FLAGS_FIELD[code];
+            } else if(access_map == "methods") {
+                res = res + ", "  + ACC_FLAGS_METHOD[code];
+            } else if(access_map == "class") {
+                res = res + ", "  + ACC_FLAGS_CLASS[code];
+            }
+        }
     }
     
+    return res;
 }
 
 void populate_acc_maps() {
     populate_acc_class_map();
     populate_acc_fields_map();
     populate_acc_methods_map();
+    acc_flags.push_back(ACC_PUBLIC);
+    acc_flags.push_back(ACC_PROTECTED);
+    acc_flags.push_back(ACC_STATIC);
+    acc_flags.push_back(ACC_PRIVATE);
+    acc_flags.push_back(ACC_FINAL);
+    acc_flags.push_back(ACC_SUPER);
+    acc_flags.push_back(ACC_VOLATILE);
+    acc_flags.push_back(ACC_TRANSIENT);
+    acc_flags.push_back(ACC_NATIVE);
+    acc_flags.push_back(ACC_INTERFACE);
+    acc_flags.push_back(ACC_ABSTRACT);
+    acc_flags.push_back(ACC_STRICT);
+    acc_flags.push_back(ACC_SYNTHETIC);
+    acc_flags.push_back(ACC_ANNOTATION);
+    acc_flags.push_back(ACC_ENUM);
 }
 
 void populate_acc_class_map() {
