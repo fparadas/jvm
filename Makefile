@@ -47,9 +47,10 @@ $(PROJ_NAME): $(OBJ)
  
 objFolder:
 	@ mkdir -p objects
+	@ mkdir -p objects/cpp
  
 clean:
-	@ $(RM) ./objects/*.o $(PROJ_NAME) *~
-	@ rmdir objects
+	@ $(RM) ./objects/cpp/*.o $(PROJ_NAME) *~
+	@ $(RM) objects
  
 .PHONY: all clean
