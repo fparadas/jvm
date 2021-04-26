@@ -6,11 +6,13 @@
 #include "../h/reader.h"
 #include "../h/printer.h"
 #include "../h/deinit.h"
+#include "../h/jvm.h"
 
 int main(int argc, char *argv[]) {
     char filename[BUFSIZ], option[BUFSIZ];
     classfile cf = {0};
-
+    JVM mem = {0};
+    char *class_name;
     if (argc != 2 && argc != 3) {
         printf("Usage: %s [class file] [--summary | --show-all]\n", argv[0]);
         return 0;
@@ -22,6 +24,7 @@ int main(int argc, char *argv[]) {
         strcpy(option, argv[2]);
     }
 
+    class_name = strrchr(argv[1], '/');
     strcpy(filename, argv[1]);
     FILE* fp = fopen(filename, "rb");
     if (!fp) {
@@ -39,8 +42,18 @@ int main(int argc, char *argv[]) {
             std::cout << "File name differs of source file name, aborting " << src_file << std::endl;
             return 1;
         }
-        if(!strcmp(option, "default") || !strcmp(option, "--summary")) {
-            print_summary(&cf);
+        if(!strcmp(option, "default") || !strcmp(option, "--execute")) {
+            init_jvm(&mem);
+
+            jvm_load_class(&mem, argv[1]);
+            jvm_set_current_class(&mem, class_name);
+            jvm_exec_clinit(&mem);
+            jvm_set_current_method(&mem, "main");
+
+            jvm_push_frame(&mem);
+            jvm_run(&mem);
+
+            deinit_jvm(&mem);
         } else if (!strcmp(option, "--show-all")) {
             print_all(&cf);
         }
