@@ -22,11 +22,19 @@ void deinit_frame(Frame *frame) {
 }
 
 void push_stack(Frame *frame, uint64_t operand) {
+  
+  #ifdef DEBUG
+      printf("pushing operand %d\n", operand);
+  #endif
   assert(frame->i < frame->n_operands);
   frame->operands[frame->i++] = operand;
 }
 
 uint64_t pop_stack(Frame *frame) {
+  
+  #ifdef DEBUG
+      printf("popping operand: %d\n", frame->i);
+  #endif
   assert(frame->i > 0);
   return frame->operands[--frame->i];
 }

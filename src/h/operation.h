@@ -218,9 +218,10 @@ void athrow(Frame *f, u4 a0, u4 a1);
 void multianewarray(Frame *f, u4 a0, u4 a1);
 
 void anewarray(Frame *f, u4 a0, u4 a1);
+void arraylength(Frame *f, u4 a0, u4 a1);
 
 void dup(Frame *f, u4 a0, u4 a1);
-
+void dup2(Frame *f, u4 a0, u4 a1);
 void _new(Frame *f, u4 a0, u4 a1);
 void getfield(Frame *f, u4 a0, u4 a1);
 void putfield(Frame *f, u4 a0, u4 a1);

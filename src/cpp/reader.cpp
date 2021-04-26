@@ -52,7 +52,6 @@ int read_class_file(classfile *file, FILE *fp) {
     }
 
     file->attributes_count = read_u2(fp);
-    std::cout << "attributes_count: " << file->attributes_count <<std::endl;
 
     file->attributes = (attribute_info*) calloc(file->attributes_count, sizeof(attribute_info));
 
@@ -133,8 +132,6 @@ void read_attribute_info(FILE *fp, attribute_info *att_ptr, cp_info *cp)
 
     char *str = get_cp_string(cp, att_ptr->attribute_name_index);
 
-    std::cout << "Attr: " << str <<std::endl;
-
     if (strcmp("Code", str) == 0)
     {
         read_code_attribute(&att_ptr->info.code, fp, cp);
@@ -194,8 +191,6 @@ void read_single_field(FILE *fp, field_info *field, cp_info *cp)
     field->name_index = read_u2(fp);
     field->description_index = read_u2(fp);
     field->attribute_count = read_u2(fp);
-
-    std::cout << "attributes_count: " << field->attribute_count <<std::endl;
 
     field->attributes = (attribute_info *) calloc(field->attribute_count, sizeof(attribute_info));
     if (field->attribute_count > 0) {

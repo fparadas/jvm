@@ -24,6 +24,11 @@ typedef struct Frame {
   int32_t method_index;
 } Frame;
 
+typedef struct JArray {
+  void *ptr;
+  int32_t size;
+} JArray;
+
 /**
  * @brief Initializes a frame pointed by a jvm
  * 

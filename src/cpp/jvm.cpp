@@ -153,6 +153,10 @@ int jvm_cycle(JVM *jvm) {
     u4 index = (a[0] << 8) | a[1];
     multianewarray(f, index, a[2]);
   } else {
+  #ifdef DEBUG
+        std::cout << "operation " << strings_opcodes[opcode];
+      printf(": %d, %d\n", strings_opcodes[opcode], a[0], a[1]);
+  #endif
     optable[opcode](f, a[0], a[1]);
   }
   if (opcode == OP_return && jvm_in_main(jvm)) {
@@ -209,8 +213,8 @@ void jvm_run_method(JVM *jvm) {
 
 #ifdef DEBUG
   printf("Current class: %s\n", get_class_name(jvm->method_area->classes[0]));
-  printf("Current method: %s\n", get_cp_string(class->cp, method->name_index));
-  printf("Current method descriptor: %s\n", get_cp_string(class->cp, method->descriptor_index));
+  printf("Current method: %s\n", get_cp_string(_class->cp, method->name_index));
+  printf("Current method descriptor: %s\n", get_cp_string(_class->cp, method->description_index));
   printf("Max locals:%d\nMax stack: %d\n", code->max_locals, code->max_stack);
 #endif
 

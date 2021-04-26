@@ -45,8 +45,8 @@ int main(int argc, char *argv[]) {
         if(!strcmp(option, "default") || !strcmp(option, "--execute")) {
             init_jvm(&mem);
 
-            jvm_load_class(&mem, argv[1]);
-            jvm_set_current_class(&mem, class_name);
+            jvm_load_class(&mem, filename);
+            jvm_set_current_class(&mem, filename);
             jvm_exec_clinit(&mem);
             jvm_set_current_method(&mem, "main");
 
