@@ -162,3 +162,4 @@ void frame_set_local_pointer(Frame *frame, u4 index, void *value) {
 void* frame_get_local_pointer(Frame *frame, u4 index) {
   uint64_t x = frame_get_local(frame, index);
   return *((void **) (&x));
+}
